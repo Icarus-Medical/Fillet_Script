@@ -38,12 +38,9 @@ def run(context):
 
             return fillets.add(finput)
 
-        #create_fillet('top_frame', "0.04 in", .3, .3)
-        #create_fillet('bottom_frame', "0.01 in", .31, .3)
 
-
-        create_fillet('top_frame', "0.04 in", 3.75, 3.5)
-        create_fillet('bottom_frame', "0.04 in", 3.75, 3.5)
+        create_fillet('top_frame', "0.04 in", 3.9, 3.5)
+        create_fillet('bottom_frame', "0.04 in", 3.9, 3.5)
 
         des = app.activeProduct
         root = des.rootComponent
