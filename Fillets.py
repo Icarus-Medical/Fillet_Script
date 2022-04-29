@@ -40,7 +40,7 @@ def run(context):
 
 
         create_fillet('top_frame', "0.04 in", 3.9, 3.5)
-        create_fillet('bottom_frame', "0.04 in", 3.9, 3.5)
+        create_fillet('bottom_frame', "0.04 in", 4.1, 3.5)
 
         des = app.activeProduct
         root = des.rootComponent
