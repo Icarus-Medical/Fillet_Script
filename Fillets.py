@@ -79,36 +79,36 @@ def run(context):
         fillet_edge = adsk.core.ObjectCollection.create()
 
         
-        for face in bframe.faces:
-            for edge in face.edges:
-                if  c1xn < edge.startVertex.geometry.x < c1xp:
-                    if c1yn < edge.startVertex.geometry.y < c1yp:
-                        if c1zn < edge.startVertex.geometry.z < c1zp:
-                            if .25 < edge.length < .4:
-                                fillet_edge.add(edge)
-                            elif .57 < edge.length < .67:
-                                fillet_edge.add(edge)
-                            elif .85 < edge.length < 1:
-                                fillet_edge.add(edge)
-        for face in bframe.faces:
-            for edge in face.edges:
-                if  c2xn < edge.startVertex.geometry.x < c2xp:
-                    if c2yn < edge.startVertex.geometry.y < c2yp:
-                        if c2zn < edge.startVertex.geometry.z < c2zp:
-                            if .25 < edge.length < .4:
-                                fillet_edge.add(edge)
-                            elif .57 < edge.length < .67:
-                                fillet_edge.add(edge)
-                            elif .85 < edge.length < 1:
-                                fillet_edge.add(edge)
+        # for face in bframe.faces:
+        #     for edge in face.edges:
+        #         if  c1xn < edge.startVertex.geometry.x < c1xp:
+        #             if c1yn < edge.startVertex.geometry.y < c1yp:
+        #                 if c1zn < edge.startVertex.geometry.z < c1zp:
+        #                     if .25 < edge.length < .4:
+        #                         fillet_edge.add(edge)
+        #                     elif .57 < edge.length < .67:
+        #                         fillet_edge.add(edge)
+        #                     elif .85 < edge.length < 1:
+        #                         fillet_edge.add(edge)
+        # for face in bframe.faces:
+        #     for edge in face.edges:
+        #         if  c2xn < edge.startVertex.geometry.x < c2xp:
+        #             if c2yn < edge.startVertex.geometry.y < c2yp:
+        #                 if c2zn < edge.startVertex.geometry.z < c2zp:
+        #                     if .25 < edge.length < .4:
+        #                         fillet_edge.add(edge)
+        #                     elif .57 < edge.length < .67:
+        #                         fillet_edge.add(edge)
+        #                     elif .85 < edge.length < 1:
+        #                         fillet_edge.add(edge)
 
 
-        radius_input = adsk.core.ValueInput.createByString(".01 in")
-        finput = fillets.createInput()
-        finput.addConstantRadiusEdgeSet(fillet_edge,radius_input, True)
-        finput.isG2 = False
-        finput.isRollingBallCorner = True
-        fillets.add(finput)
+        # radius_input = adsk.core.ValueInput.createByString(".01 in")
+        # finput = fillets.createInput()
+        # finput.addConstantRadiusEdgeSet(fillet_edge,radius_input, True)
+        # finput.isG2 = False
+        # finput.isRollingBallCorner = True
+        # fillets.add(finput)
 
 
     except:
