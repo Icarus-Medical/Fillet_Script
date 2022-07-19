@@ -1,117 +1,127 @@
 #Author-
 #Description-
 
-import adsk.core, adsk.fusion, adsk.cam, traceback
+import adsk.core, adsk.fusion, adsk.cam, traceback, math
 
 def run(context):
-    ui = None
-    try:
-        app = adsk.core.Application.get()
-        ui  = app.userInterface
-        def create_fillet(body, radius, upLimit, loLimit):
-            '''
-            body is the body to be filleted by checking edge lengths (string)
-            radius is the fillet radius (string)
-            upLimit is the upper limit of edge length (float)
-            loLimit is lowee limit of edge length (float)
-            this method searches a body for edge length between certain length. those edges are then filleted to the radius
-            '''
-            app = adsk.core.Application.get()
-            ui  = app.userInterface
-            des = app.activeProduct
-            root = des.rootComponent
-            fillets = root.features.filletFeatures
+    app = adsk.core.Application.get()
+    ui  = app.userInterface
+    des = app.activeProduct
+    root = des.rootComponent
+    occ = root.occurrences.itemByName('LOGO:1')
 
-            edgeCollection = adsk.core.ObjectCollection.create()
-            frame = root.bRepBodies.itemByName(body)
+    body1 = root.bRepBodies.item(0)
+    body2 = root.bRepBodies.item(1)
 
-            for face in frame.faces:
-                for edge in face.edges:
-                    if edge.length > loLimit and edge.length < upLimit:
-                        edgeCollection.add(edge)
-
-            radius_input = adsk.core.ValueInput.createByString(radius)
-            finput = fillets.createInput()
-            finput.addConstantRadiusEdgeSet(edgeCollection, radius_input, True) 
-            finput.isG2 = False
-            finput.isRollingBallCorner = True
-
-            return fillets.add(finput)
+    if body1.volume > body2.volume:
+        tframe = body1
+        bframe = body2
+    else:
+        tframe = body2
+        bframe = body1
 
 
-        create_fillet('top_frame', "0.04 in", 3.9, 3.5)
-        create_fillet('bottom_frame', "0.04 in", 4.1, 3.5)
 
-        des = app.activeProduct
-        root = des.rootComponent
-        fillets = root.features.filletFeatures
+    strap_slots = adsk.core.ObjectCollection.create()
 
-        bframe = root.bRepBodies.itemByName("bottom_frame")
+    icarus = occ.component.bRepBodies.itemByName('I')
+    iCent = icarus.faces.item(0).centroid
 
-        bip1 = root.sketches.itemByName("BIP-14")
-        bip2 = root.sketches.itemByName("BIP-24")
+    for face in tframe.faces:
+        if 50<face.area<70:
+            if face.centroid.x < 0:
+                leftPipe = face
+            else:
+                rightPipe = face
+        elif face.area > 350:
+            tframeFace = face
+        elif 3.75<face.area<5.5:
+            strap_slots.add(face)
 
-        circle1 = bip1.sketchCurves.sketchCircles.item(0).centerSketchPoint
-        circle2= bip2.sketchCurves.sketchCircles.item(0).centerSketchPoint
-
-        circle1box = circle1.worldGeometry
-        circle2box = circle2.worldGeometry
-
-        circle1x=circle1box.x
-        circle1y=circle1box.y
-        circle1z=circle1box.z
-        circle2x=circle2box.x
-        circle2y=circle2box.y
-        circle2z=circle2box.z
-
-        c1xp = circle1x + .7
-        c1xn = circle1x -.7
-        c1yp = circle1y +.7
-        c1yn = circle1y -.7
-        c1zp = circle1z +.4
-        c1zn = circle1z -.4
-        c2xp = circle2x + .7
-        c2xn = circle2x -.7
-        c2yp = circle2y +.7
-        c2yn = circle2y -.7
-        c2zp = circle2z +.4
-        c2zn = circle2z -.4
-        fillet_edge = adsk.core.ObjectCollection.create()
-
-        
-        # for face in bframe.faces:
-        #     for edge in face.edges:
-        #         if  c1xn < edge.startVertex.geometry.x < c1xp:
-        #             if c1yn < edge.startVertex.geometry.y < c1yp:
-        #                 if c1zn < edge.startVertex.geometry.z < c1zp:
-        #                     if .25 < edge.length < .4:
-        #                         fillet_edge.add(edge)
-        #                     elif .57 < edge.length < .67:
-        #                         fillet_edge.add(edge)
-        #                     elif .85 < edge.length < 1:
-        #                         fillet_edge.add(edge)
-        # for face in bframe.faces:
-        #     for edge in face.edges:
-        #         if  c2xn < edge.startVertex.geometry.x < c2xp:
-        #             if c2yn < edge.startVertex.geometry.y < c2yp:
-        #                 if c2zn < edge.startVertex.geometry.z < c2zp:
-        #                     if .25 < edge.length < .4:
-        #                         fillet_edge.add(edge)
-        #                     elif .57 < edge.length < .67:
-        #                         fillet_edge.add(edge)
-        #                     elif .85 < edge.length < 1:
-        #                         fillet_edge.add(edge)
+    for slotFace in strap_slots:
+        if slotFace.centroid.x < 0 and 6<slotFace.centroid.z < 9 and slotFace.centroid.y < iCent.y:
+            frontLeftSlot = slotFace
+        elif slotFace.centroid.x > 0 and 6<slotFace.centroid.z < 9 and slotFace.centroid.y < iCent.y:
+            frontRightSlot = slotFace
 
 
-        # radius_input = adsk.core.ValueInput.createByString(".01 in")
-        # finput = fillets.createInput()
-        # finput.addConstantRadiusEdgeSet(fillet_edge,radius_input, True)
-        # finput.isG2 = False
-        # finput.isRollingBallCorner = True
-        # fillets.add(finput)
+    for bface in bframe.faces:
+        if 10<bface.area<15:
+            if bface.centroid.x < 0 and bface.centroid.z > -5:
+                leftElastic = bface
+            elif bface.centroid.x > 0 and bface.centroid.z > -5:
+                rightElastic = bface
+        elif bface.area > 200:
+            bframeFace = bface 
+    measurments = adsk.core.ObjectCollection.create()
+
+    frameToLP = app.measureManager.measureMinimumDistance(tframeFace,leftPipe)
+    measurments.add(frameToLP)
+    frameToRP = app.measureManager.measureMinimumDistance(tframeFace,rightPipe)
+    measurments.add(frameToRP)
+    FLStoLP = app.measureManager.measureMinimumDistance(leftPipe,frontLeftSlot)
+    measurments.add(FLStoLP)
+    FRStoRP = app.measureManager.measureMinimumDistance(rightPipe,frontRightSlot)
+    measurments.add(FRStoRP)
+    bframeToRE = app.measureManager.measureMinimumDistance(bframeFace,rightElastic)
+    measurments.add(bframeToRE)
+    bframeToLE = app.measureManager.measureMinimumDistance(bframeFace,leftElastic)
+    measurments.add(bframeToLE)
+
+    pts = adsk.core.ObjectCollection.create()
+    alert = False
+    for measure in measurments:
+        if measure.value/2.54 < 0.02:
+            pts.add(measure.positionOne)
+            alert = True
 
 
-    except:
-        if ui:
-            ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
+    #add sphere in point of concern if less than 0.02
 
+    #calculate how many strap slots there are 
+    strapEdge = adsk.core.ObjectCollection.create()
+    for edge in tframe.edges:
+        if 3.53 < edge.length < 3.81:
+            strapEdge.add(edge)
+
+
+
+
+
+
+    tframeMessage = 'Tframe to left pipe path: ' + str(frameToLP.value/2.54) + ' in.' + '\n' + 'Tframe to right pipe path: ' + str(frameToRP.value/2.54) + ' in.' + '\n' + 'Pipe to front left strap: ' + str(FLStoLP.value/2.54) + ' in.' + '\n' + 'Pipe to front right strap: ' + str(FRStoRP.value/2.54) + ' in.'
+    bframeMessage = '\n' + 'Bframe to left elastic path: ' + str(bframeToLE.value/2.54) + ' in.' + '\n' + 'Bframe to right elastic path: ' + str(bframeToRE.value/2.54) + ' in.'
+
+    if alert:
+        alertMessage = '\n' + '\n' + 'ALERT ALERT ALERT:   SLOPPY MODELING DETECTED' + '\n' + 'ACTION NEEDED ASAPPPPPP'
+    else:
+        alertMessage = ''
+
+
+    ui.messageBox(tframeMessage + bframeMessage + alertMessage)
+
+    if alert:
+        for sPt in pts:
+            temp = sPt.y
+            sPt.y = sPt.z
+            sPt.z = temp
+            sPt.y = -sPt.y
+            xzPlane = root.xZConstructionPlane
+            sk = root.sketches.add(xzPlane)
+            circles = sk.sketchCurves.sketchCircles
+            circ = circles.addByCenterRadius(sPt,2.5)
+            lines = sk.sketchCurves.sketchLines
+            axis = lines.addByTwoPoints(adsk.core.Point3D.create(sPt.x + 2.5,sPt.y,sPt.z), adsk.core.Point3D.create(sPt.x - 2.5,sPt.y,sPt.z))
+            prof = sk.profiles.item(0)
+            revInput = root.features.revolveFeatures.createInput(prof,axis, adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
+            angle = adsk.core.ValueInput.createByReal(2*math.pi)
+            revInput.setAngleExtent(False,angle)
+            root.features.revolveFeatures.add(revInput)
+
+            num = root.bRepBodies.count
+            spBod = root.bRepBodies.item(num-1)
+
+            lib = app.materialLibraries.itemByName('Fusion 360 Appearance Library')
+            redPaint = lib.appearances.itemByName('Paint - Enamel Glossy (Red)')
+            spBod.appearance = redPaint
+            app.activeViewport.refresh()
