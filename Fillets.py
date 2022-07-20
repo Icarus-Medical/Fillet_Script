@@ -40,7 +40,10 @@ def run(context):
 
         #create_fillet('top_frame', "0.04 in", .3, .3)
         #create_fillet('bottom_frame', "0.01 in", .31, .3)
-
+        des = app.activeProduct
+        root = des.rootComponent
+        fillets = root.features.filletFeatures
+        
         body1 = root.bRepBodies.item(0)
         body2 = root.bRepBodies.item(1)
 
@@ -53,10 +56,6 @@ def run(context):
 
         create_fillet(tframe, "0.04 in", 3.75, 3.5)
         create_fillet(bframe, "0.04 in", 3.75, 3.5)
-
-        des = app.activeProduct
-        root = des.rootComponent
-        fillets = root.features.filletFeatures
 
 
         bip1 = root.sketches.itemByName("BIP-14")
