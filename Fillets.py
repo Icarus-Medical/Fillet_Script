@@ -1,13 +1,18 @@
-#Author-
-#Description-
+# Author-
+# Description-
 
-import adsk.core, adsk.fusion, adsk.cam, traceback
+import adsk.core
+import adsk.fusion
+import adsk.cam
+import traceback
+
 
 def run(context):
     ui = None
     try:
         app = adsk.core.Application.get()
-        ui  = app.userInterface
+        ui = app.userInterface
+
         def create_fillet(body, radius, upLimit, loLimit):
             '''
             body is the body to be filleted by checking edge lengths (string)
@@ -17,7 +22,7 @@ def run(context):
             this method searches a body for edge length between certain length. those edges are then filleted to the radius
             '''
             app = adsk.core.Application.get()
-            ui  = app.userInterface
+            ui = app.userInterface
             des = app.activeProduct
             root = des.rootComponent
             fillets = root.features.filletFeatures
@@ -32,7 +37,7 @@ def run(context):
 
             radius_input = adsk.core.ValueInput.createByString(radius)
             finput = fillets.createInput()
-            finput.addConstantRadiusEdgeSet(edgeCollection, radius_input, True) 
+            finput.addConstantRadiusEdgeSet(edgeCollection, radius_input, True)
             finput.isG2 = False
             finput.isRollingBallCorner = True
 
@@ -43,7 +48,7 @@ def run(context):
         des = app.activeProduct
         root = des.rootComponent
         fillets = root.features.filletFeatures
-        
+
         body1 = root.bRepBodies.item(0)
         body2 = root.bRepBodies.item(1)
 
@@ -58,6 +63,7 @@ def run(context):
         create_fillet(bframe, "0.04 in", 3.75, 3.5)
 
 
+#george Test
         bip1 = root.sketches.itemByName("BIP-14")
         bip2 = root.sketches.itemByName("BIP-24")
 
@@ -88,34 +94,50 @@ def run(context):
         c2zn = circle2z -.4
         fillet_edge = adsk.core.ObjectCollection.create()
 
-        
         for face in bframe.faces:
             for edge in face.edges:
                 if  c1xn < edge.startVertex.geometry.x < c1xp:
                     if c1yn < edge.startVertex.geometry.y < c1yp:
                         if c1zn < edge.startVertex.geometry.z < c1zp:
-                            if .25 < edge.length < .4:
+                            if .6 < edge.length < .65:
                                 fillet_edge.add(edge)
-                            elif .57 < edge.length < .67:
-                                fillet_edge.add(edge)
-                            elif .85 < edge.length < 1:
-                                fillet_edge.add(edge)
+                               
         for face in bframe.faces:
             for edge in face.edges:
                 if  c2xn < edge.startVertex.geometry.x < c2xp:
                     if c2yn < edge.startVertex.geometry.y < c2yp:
                         if c2zn < edge.startVertex.geometry.z < c2zp:
-                            if .25 < edge.length < .4:
+                            if .6 < edge.length < .65:
                                 fillet_edge.add(edge)
-                            elif .57 < edge.length < .67:
-                                fillet_edge.add(edge)
-                            elif .85 < edge.length < 1:
-                                fillet_edge.add(edge)
-
+                            
 
         radius_input = adsk.core.ValueInput.createByString(".01 in")
         finput = fillets.createInput()
         finput.addConstantRadiusEdgeSet(fillet_edge,radius_input, True)
+        finput.isG2 = False
+        finput.isRollingBallCorner = True
+        fillets.add(finput)
+
+        fillet_edge_2 = adsk.core.ObjectCollection.create()
+        for face in bframe.faces:
+            for edge in face.edges:
+                if  c1xn < edge.startVertex.geometry.x < c1xp:
+                    if c1yn < edge.startVertex.geometry.y < c1yp:
+                        if c1zn < edge.startVertex.geometry.z < c1zp:
+                            if .3 < edge.length < .35:
+                                fillet_edge_2.add(edge)
+                                
+        for face in bframe.faces:
+            for edge in face.edges:
+                if  c2xn < edge.startVertex.geometry.x < c2xp:
+                    if c2yn < edge.startVertex.geometry.y < c2yp:
+                        if c2zn < edge.startVertex.geometry.z < c2zp:
+                            if .3 < edge.length < .35:
+                                fillet_edge_2.add(edge)
+                            
+
+        finput = fillets.createInput()
+        finput.addConstantRadiusEdgeSet(fillet_edge_2,radius_input, True)
         finput.isG2 = False
         finput.isRollingBallCorner = True
         fillets.add(finput)
