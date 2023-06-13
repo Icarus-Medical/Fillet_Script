@@ -30,10 +30,17 @@ def run(context):
             edgeCollection = adsk.core.ObjectCollection.create()
             frame = body
 
+            occurrences = root.occurrences.asList
+            sidewinder = occurrences.itemByName("SOCKET:1")
+            socketOrigin = adsk.core.Point3D.create(sidewinder.transform2.translation.x, sidewinder.transform2.translation.y, sidewinder.transform2.translation.z)
+            toleranceRadiusFromSocket = 2.5
+
             for face in frame.faces:
                 for edge in face.edges:
                     if edge.length > loLimit and edge.length < upLimit:
-                        edgeCollection.add(edge)
+                        if (edge.pointOnEdge.distanceTo(socketOrigin) > toleranceRadiusFromSocket):
+
+                            edgeCollection.add(edge)
 
             radius_input = adsk.core.ValueInput.createByString(radius)
             finput = fillets.createInput()
